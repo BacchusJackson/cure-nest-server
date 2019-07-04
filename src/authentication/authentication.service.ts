@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Credentials, User } from "../interfaces/userCollection.interface";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class AuthenticationService {
-
+    constructor(private readonly jwtService: JwtService) {}
+    
     postAuthenticate(credentials: Credentials) {
         // Check database for user
         const foundUser = (credentials.username == 'Peter.Parker') ? fakeUser : null;
