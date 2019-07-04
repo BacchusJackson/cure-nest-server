@@ -5,4 +5,5 @@ export class AppService {
   getHello(): string {
     return '<h1>CURE Backend Server</h1>';
   }
+
 }

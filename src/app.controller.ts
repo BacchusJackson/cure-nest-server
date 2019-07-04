@@ -14,9 +14,9 @@ export class AppController {
 
   @Post('/authenticate')
   postAuthenticate(): string {
-    return 'Heres a JWT'
+    return 'Heres a JWT Good sir'
   }
-  
+
   @Get('/data')
   @Roles('user')
   @UseGuards(RolesGuard)
