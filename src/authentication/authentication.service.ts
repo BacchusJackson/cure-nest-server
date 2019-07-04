@@ -5,7 +5,7 @@ import { JwtService } from "@nestjs/jwt";
 @Injectable()
 export class AuthenticationService {
     constructor(private readonly jwtService: JwtService) {}
-    
+
     postAuthenticate(credentials: Credentials) {
         // Check database for user
         const foundUser = (credentials.username == 'Peter.Parker') ? fakeUser : null;
@@ -17,8 +17,12 @@ export class AuthenticationService {
         const goodPassword = (credentials.password == 'password');
 
         if(!goodPassword) return null;
-
         
+        // Sign the userID, creating a token
+        const userToken: string = this.jwtService.sign({userID: foundUser.userID});
+
+        // Return the token
+        return {expiresIn: 3600, userToken}
     }
 
 }
