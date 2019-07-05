@@ -22,7 +22,7 @@ export class AuthenticationService {
         const userToken: string = this.jwtService.sign({userID: foundUser.userID});
 
         // Return the token
-        return {expiresIn: 3600, userToken}
+        return {expiresIn: 3600, userToken};
     }
 
 }

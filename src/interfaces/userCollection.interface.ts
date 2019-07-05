@@ -12,3 +12,9 @@ export interface User {
     site_clinic_id: string;
     roles: string[];
 }
+
+export interface SignInResponse {
+    success: boolean;
+    message: string;
+    user?: User;
+}
