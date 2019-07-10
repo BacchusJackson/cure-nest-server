@@ -2,40 +2,39 @@ import { Injectable } from '@nestjs/common';
 import { Credentials, User, SignInResponse } from "../interfaces/userCollection.interface";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
+import { stringLiteral } from '@babel/types';
 
 @Injectable()
 export class AuthenticationService {
-    constructor(private readonly jwtService: JwtService, private readonly usersService:UsersService) {}
+  constructor(private readonly jwtService: JwtService, private readonly usersService: UsersService) { }
 
-    postAuthenticate(credentials: Credentials) {
-        
-        const response: SignInResponse = {success:false, message: null, user: null, token:null};
-        
-        // Check database for user
-        response.user = this.usersService.findUser({username: credentials.username});
-        
-        // If No user was found
-        if(!response.user) {
-            response.message = "Invalid Credentials";
-            return response;
-        }
-        
-        // Compare passwords
-        const goodPassword = (credentials.password == 'password');
+  authenticateUserCredentials(credentials: Credentials): SignInResponse {
 
-        if(!goodPassword) {
-            response.message = "Invalid Credentials";
-            response.user = null;
-            return response;
-        }
-        
-        // Sign the userID, creating a token
-        response.token = this.jwtService.sign({userID: response.user.userID});
+    // Check database for user
+    const foundUser = this.usersService.readUserByUsername(credentials.username).user;
 
-        response.success = true;
-        response.expiresIn = 3600;
-
-        // Return the token 
-        return response;
+    if (!foundUser) {
+      return { success: false, message: 'Invalid Credentials' };
     }
+
+    // Compare password hashes
+    if (!this.confirmPassword) {
+      return { success: false, message: 'Invalid Credentials' };
+    }
+    // Sign the userID, creating a token
+    const token = this.jwtService.sign({ userID: foundUser.userID });
+
+    return { success: true, token: token, expiresIn: 3600 };
+  }
+
+  private confirmPassword(user: User, passwordAttempt: string) {
+    // TODO: Select SQL Command
+    const hashedPassword = 'MASKED';
+
+    if (passwordAttempt === hashedPassword) {
+      return { success: true, user: user };
+    } else {
+      return { success: false, message: 'Invalid Credentials' };
+    }
+  }
 }

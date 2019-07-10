@@ -4,24 +4,23 @@ import { Entry, NewEntry, Response } from '../interfaces/entryCollection.interfa
 @Injectable()
 export class EntryService {
 
-  addEntry(newEntry: NewEntry): Response {
+  createEntry(newEntry: NewEntry): Response {
 
     newEntry.dateCreated = new Date();
     newEntry.active = true;
 
     try {
-      // TODO: Database Insert SQL
+      // TODO: Insert SQL Command
       return { success: true, message: null };
     } catch (err) {
       return { success: false, message: err };
     }
-
   }
 
-  getAllEntries(): Response {
+  readAllEntries(): Response {
 
     try {
-      // TODO: Database Select SQL
+      // TODO: Select SQL Command
       return { success: true, message: null, entries: [fakeEntry, fakeEntry, fakeEntry]}
     } catch (err) {
       return { success: false, message: err}
@@ -30,17 +29,12 @@ export class EntryService {
 
   deleteEntry(entryID: string): Response {
 
-    if (!this.getEntryByID(entryID)) {
-      return { success: true, message: 'Entry not Found' }
-    }
-
     try {
-      // TODO: Database Update SQL
+      // TODO: Update SQL Command ActiveBit = 0
       return { success: true, message: null }
     } catch (err) {
       return { success: false, message: err }
     }
-
   }
 
   private getEntryByID(entryID: string): Entry {

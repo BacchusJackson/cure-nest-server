@@ -2,6 +2,7 @@ export interface Activity {
     activityID: string;
     name: string;
     categoryID: string;
+    parameters?: any;
 }
 
 export interface NewActivity {
