@@ -8,9 +8,10 @@ import { EntryController } from './entry/entry.controller';
 import { EntryService } from './entry/entry.service';
 import { ActivityService } from './activity/activity.service';
 import { ActivityController } from './activity/activity.controller';
+import { TypeOrmModule } from "@nestjs/typeorm";
 
 @Module({
-  imports: [AuthenticationModule],
+  imports: [AuthenticationModule, TypeOrmModule.forRoot()],
   controllers: [AppController, UsersController, EntryController, ActivityController],
   providers: [AppService, UsersService, EntryService, ActivityService],
 })
