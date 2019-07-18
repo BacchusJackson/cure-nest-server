@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Put, Param, Delete } from '@nestjs/common';
 import { ActivityService } from './activity.service';
-import { NewActivity } from '../interfaces/activityCollection.interface';
+import { NewActivity } from './activityCollection.interface';
 import { identifier } from '@babel/types';
 
 @Controller('activity')

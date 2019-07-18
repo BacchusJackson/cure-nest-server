@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Activity, NewActivity, Response } from '../interfaces/activityCollection.interface';
+import { Activity, NewActivity, Response } from './activityCollection.interface';
 
 @Injectable()
 export class ActivityService {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Entry, NewEntry, Response } from '../interfaces/entryCollection.interface'
+import { Entry, NewEntry, Response } from './entryCollection.interface'
 
 @Injectable()
 export class EntryService {

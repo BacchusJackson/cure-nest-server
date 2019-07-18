@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, NewUser, Response, UpdatedUser } from "../interfaces/userCollection.interface";
+import { User, NewUser, Response, UpdatedUser } from "./userCollection.interface";
 
 @Injectable()
 export class UsersService {
@@ -23,6 +23,8 @@ export class UsersService {
 
     try {
       // TODO: Select SQL Command
+      
+
       return { success: true, user: fakeUser }
     } catch (err) {
       return { success: false, message: err }

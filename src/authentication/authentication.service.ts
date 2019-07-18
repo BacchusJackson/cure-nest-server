@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Credentials, User, SignInResponse } from "../interfaces/userCollection.interface";
+import { Credentials, User, SignInResponse } from "../users/userCollection.interface";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
 import { stringLiteral } from '@babel/types';
