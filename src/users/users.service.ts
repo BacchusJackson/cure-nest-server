@@ -69,6 +69,6 @@ export const fakeUser: User = {
   lastName: 'Parker',
   displayName: 'Spiderman',
   lastLogin: new Date(),
-  site_clinic_id: 'langley-mental-health',
+  siteClinicId: 'langley-mental-health',
   roles: ['user', 'admin']
 }

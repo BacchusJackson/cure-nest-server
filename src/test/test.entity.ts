@@ -1,16 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn, PrimaryColumn, Generated } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-    export class TestEntity {
-        @PrimaryGeneratedColumn('uuid')
-        id: string;
-        
-        @Column()
-        name: string;
+export class TestEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-        @Column('bit')
-        active: boolean;
+  @Column()
+  name: string;
 
-        @Column({nullable: true, type: 'datetime'})
-        created?: Date;
-    }
+  @Column('bit')
+  active: boolean;
+
+  @Column({ nullable: true, type: 'datetime' })
+  created?: Date;
+}

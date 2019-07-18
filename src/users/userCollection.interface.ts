@@ -9,7 +9,7 @@ export interface User {
     lastName: string;
     displayName: string;
     lastLogin: Date;
-    site_clinic_id: string;
+    siteClinicId: string;
     roles: string[];
 }
 
@@ -18,7 +18,7 @@ export interface UpdatedUser {
     firstname?: string;
     lastname?:string;
     displayName?:string;
-    site_clinic_id?: string;
+    siteClinicId?: string;
 }
 
 export interface NewUser {
