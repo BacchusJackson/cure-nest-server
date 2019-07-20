@@ -1,50 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { Activity, NewActivity, Response } from './activityCollection.interface';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { ActivityDTO } from './activity.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ActivityEntity } from './activity.entity';
+import { Repository } from 'typeorm';
+
+
 
 @Injectable()
 export class ActivityService {
 
-  createActivity(newActivity: NewActivity): Response {
-    try {
-      // TODO: Insert SQL Command
-      console.log(newActivity);
-      return { success: true }
-    } catch (err) {
-      return { success: false, message: err };
-    }
+  constructor(
+    @InjectRepository(ActivityEntity)
+    private activityRepository: Repository<ActivityEntity>
+  ) { }
+
+  async createActivity(newActivity: ActivityDTO) {
+    const activity = await this.activityRepository.create(newActivity);
+    await this.activityRepository.save(activity);
+
+    return activity.toResponseObject();
   }
 
-  readAllActivities(): Response {
-    try {
-      // TODO: Select SQL Command
-      return { success: true, activities: [fakeActivity, fakeActivity, fakeActivity, fakeActivity] }
-    } catch (err) {
-      return { success: false, message: err };
-    }
+  async readAllActivities() {
+    const activities = await this.activityRepository.find({ where: { active: true } });
+
+    return activities.map(activity => activity.toResponseObject());
   }
 
-  updateActivity(activityID: string, updatedActivity: NewActivity): Response {
-    try {
-      // TODO: Update SQL Command
-      console.log(updatedActivity);
-      return { success: true, activity: fakeActivity };
-    } catch (err) {
-      return { success: false, message: err };
+  async updateActivity(activityID: string, updatedActivity: Partial<ActivityDTO>) {
+    let activity = await this.activityRepository.findOne({ where: { id: activityID } });
+
+    if (!activity) {
+      throw new HttpException('Activity Not Found', HttpStatus.NOT_FOUND);
     }
+
+    await this.activityRepository.update({ id: activityID }, updatedActivity);
+
+    activity = await this.activityRepository.findOne({ where: { id: activityID } });
+
+    return activity.toResponseObject();
+
   }
 
-  deleteActivity(activityID: string): Response {
-    try {
-      // TODO: Update SQL Command ActiveBit = 0
-      return { success: true };
-    } catch (err) {
-      return { success: false, message: err };
-    }
-  }
-}
+  async deleteActivity(activityID: string) {
+    let activity = await this.activityRepository.findOne({ where: { id: activityID } });
 
-export const fakeActivity: Activity = {
-  activityID: '1234',
-  name: 'Sports Event',
-  categoryID: '1209aef'
+    if (!activity) {
+      throw new HttpException('Activity Not Found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.activityRepository.update({ id: activityID }, { active: false });
+
+    return { success: true }
+  }
 }

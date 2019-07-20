@@ -1,4 +1,4 @@
-import { IsString, IsDate } from "class-validator";
+import { IsString } from "class-validator";
 import { UserEntity } from "../users/user.entity";
 
 export class UserDTO {

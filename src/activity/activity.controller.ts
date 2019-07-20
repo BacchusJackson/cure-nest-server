@@ -1,14 +1,13 @@
 import { Controller, Post, Body, Get, Put, Param, Delete } from '@nestjs/common';
 import { ActivityService } from './activity.service';
-import { NewActivity } from './activityCollection.interface';
-import { identifier } from '@babel/types';
+import { ActivityDTO } from "./activity.dto";
 
 @Controller('activity')
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) { }
 
   @Post()
-  newActivityRequest(@Body() newActivity: NewActivity) {
+  newActivityRequest(@Body() newActivity: ActivityDTO) {
     return this.activityService.createActivity(newActivity);
   }
 
@@ -18,7 +17,7 @@ export class ActivityController {
   }
 
   @Put('/:id')
-  modifyActivityRequest(@Param('id') id, @Body() updatedActivity: NewActivity) {
+  modifyActivityRequest(@Param('id') id, @Body() updatedActivity: ActivityDTO) {
     return this.activityService.updateActivity(id, updatedActivity)
   }
 
