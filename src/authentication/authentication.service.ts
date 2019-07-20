@@ -2,16 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Credentials, User, SignInResponse } from "../users/userCollection.interface";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
-import { stringLiteral } from '@babel/types';
 
 @Injectable()
 export class AuthenticationService {
-  constructor(private readonly jwtService: JwtService, private readonly usersService: UsersService) { }
+  constructor(private readonly jwtService: JwtService ) { }
 
   authenticateUserCredentials(credentials: Credentials): SignInResponse {
 
     // Check database for user
-    const foundUser = this.usersService.readUserByUsername(credentials.username).user;
+    const foundUser = null //this.usersService.readUserByUsername(credentials.username).user;
 
     if (!foundUser) {
       return { success: false, message: 'Invalid Credentials' };

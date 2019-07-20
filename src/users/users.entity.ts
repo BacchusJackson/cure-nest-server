@@ -9,7 +9,7 @@ export class UsersEntity {
   active: boolean;
 
   @Column('datetime')
-  dbOrigin: Date;
+  dbOriginDate: Date;
 
   @Column('datetime')
   dbLastLogOn: Date;
@@ -25,11 +25,8 @@ export class UsersEntity {
 
   @Column()
   displayName: string;
-  
-  @Column('array')
-  Roles: string[];
 
-  @Column('uuid')
+  @Column({nullable: true, type: 'uuid'})
   siteClinicID: string;
 
 }

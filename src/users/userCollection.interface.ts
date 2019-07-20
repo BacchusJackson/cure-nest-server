@@ -1,44 +1,47 @@
 export interface Credentials {
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 }
 export interface User {
-    userID: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-    displayName: string;
-    lastLogin: Date;
-    siteClinicId: string;
-    roles: string[];
+  userID: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  lastLogin: Date;
+  siteClinicId: string;
+  roles: string[];
 }
 
 export interface UpdatedUser {
-    username?: string;
-    firstname?: string;
-    lastname?:string;
-    displayName?:string;
-    siteClinicId?: string;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  displayName?: string;
+  siteClinicId?: string;
 }
 
 export interface NewUser {
-    username: string;
-    firstName: string;
-    lastName: string;
-    password: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  password: string;
 }
 
-export interface SignInResponse {
-    success: boolean;
-    message?: string;
-    token?: string;
-    user?: User;
-    expiresIn?: number;
+export interface UserDTO extends NewUser {
+  displayName: string;
+  active: boolean;
+  dbOriginDate: Date;
+  dbLastLogOn: Date;
 }
 
 export interface Response {
-    success: boolean;
-    message?: string;
-    user?: User;
-    
+  success: boolean;
+  message?: string;
+  user?: User;
+
+}
+export interface SignInResponse extends Response {
+  token?: string;
+  expiresIn?: number;
 }

@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TestEntity } from './test.entity';
 import { Repository } from 'typeorm';
+import { UsersService } from "../users/users.service";
 
 @Injectable()
 export class TestService {
   constructor(
     @InjectRepository(TestEntity)
-    private testRepository: Repository<TestEntity>
+    private testRepository: Repository<TestEntity>,
+    private readonly usersService:UsersService
   ) { }
   async createTestRequest() {
     const sampleTest: Test = {
@@ -15,11 +17,13 @@ export class TestService {
       created: new Date(),
       active: true
     }
+
     console.log('Creating Test...');
 
     const newTest = await this.testRepository.create(sampleTest);
     this.testRepository.save(newTest);
   }
+
 }
 
 export interface Test {
