@@ -1,32 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { TestEntity } from './test.entity';
-import { Repository } from 'typeorm';
-import { UsersService } from "../users/users.service";
-
+import { getManager, getRepository } from "typeorm";
+import { Test } from "./test.entity";
 @Injectable()
 export class TestService {
   constructor(
-    @InjectRepository(TestEntity)
-    private testRepository: Repository<TestEntity>,
-    private readonly usersService:UsersService
   ) { }
   async createTestRequest() {
-    const sampleTest: Test = {
-      name: "Test Two",
+    const sampleTest: TestDto = {
+      name: "Test Five",
       created: new Date(),
       active: true
     }
 
-    console.log('Creating Test...');
+    const testRepo = getRepository(Test);
 
-    const newTest = await this.testRepository.create(sampleTest);
-    this.testRepository.save(newTest);
+    console.log(testRepo);
+
+    await testRepo.save(sampleTest);
+
   }
 
 }
 
-export interface Test {
+export interface TestDto {
   id?: string;
   active?: boolean;
   created?: Date;

@@ -10,6 +10,11 @@ export class UsersController {
     return this.usersService.createUser(newUser);
   }
 
+  @Get()
+  getAllUsersRequest() {
+    return this.usersService.readAllUsers();
+  }
+
   @Get('/username/:username')
   getUserByUsernameRequest(@Param('username') username) {
     return this.usersService.readUserByUsername(username);

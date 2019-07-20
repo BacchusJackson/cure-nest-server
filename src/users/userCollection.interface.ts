@@ -2,8 +2,9 @@ export interface Credentials {
   username: string;
   password: string;
 }
-export interface User {
-  userID: string;
+
+export interface UserObject {
+  id: string;
   username: string;
   firstName: string;
   lastName: string;
@@ -13,7 +14,7 @@ export interface User {
   roles: string[];
 }
 
-export interface UpdatedUser {
+export interface UpdateUserOptions {
   username?: string;
   firstname?: string;
   lastname?: string;
@@ -31,14 +32,14 @@ export interface NewUser {
 export interface UserDTO extends NewUser {
   displayName: string;
   active: boolean;
-  dbOriginDate: Date;
-  dbLastLogOn: Date;
+  autoCreatedDate: Date;
+  autoLastLogOn: Date;
 }
 
 export interface Response {
   success: boolean;
   message?: string;
-  user?: User;
+  user?: UserObject;
 
 }
 export interface SignInResponse extends Response {

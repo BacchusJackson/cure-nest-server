@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Credentials, User, SignInResponse } from "../users/userCollection.interface";
+import { Credentials, SignInResponse, UserObject } from "../users/userCollection.interface";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
 
@@ -26,7 +26,7 @@ export class AuthenticationService {
     return { success: true, token: token, expiresIn: 3600 };
   }
 
-  private confirmPassword(user: User, passwordAttempt: string) {
+  private confirmPassword(user: UserObject, passwordAttempt: string) {
     // TODO: Select SQL Command
     const hashedPassword = 'MASKED';
 

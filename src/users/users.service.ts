@@ -1,124 +1,78 @@
-import { Injectable } from '@nestjs/common';
-import { User, NewUser, Response, UpdatedUser, UserDTO } from "./userCollection.interface";
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersEntity } from './users.entity';
+import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
-
+import { UserDTO } from "./user.dto";
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersEntity)
-    private usersRepository:Repository<UsersEntity>
-    ) {}
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>
+  ) { }
 
-  async createUser(newUser: NewUser): Promise<Response> {
+  async createUser(data: UserDTO) {
+    const { username } = data;
+    let user = await this.usersRepository.findOne({ where: { username } });
 
-    try {
-      // TODO: Add password to credentials table
-      const userDTO: UserDTO = {
-        username: newUser.username,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        password: newUser.password,
-        displayName: `${newUser.firstName} ${newUser.lastName}`,
-        active: true,
-        dbOriginDate: new Date(),
-        dbLastLogOn: new Date(),
-      };
-
-      const newDBUser = await this.usersRepository.create(userDTO);
-
-      await this.usersRepository.save(newDBUser);
-
-      return { success: true, user: fakeUser };
-
-    } catch (err) {
-      if(err.number === 2627) {
-        return {success: false, message: 'Username is already Taken'}
-      }
-      return { success: false, message: err };
-
+    if (user) {
+      throw new HttpException('Username is already taken', HttpStatus.BAD_REQUEST);
     }
+
+    user = await this.usersRepository.create(data);
+    await this.usersRepository.save(user);
+    return user.toResponseObject();
+
   }
 
-  async readUserByUsername(username: string): Promise<Response> {
+  async readAllUsers() {
+    const users = await this.usersRepository.find({ where: { active: true } });
 
-    try {
-      const foundUser = await this.usersRepository.findOne({where: {username}});
-
-      if (!foundUser || foundUser.active === false) {
-        return {success: false, message: 'User Not Found'}
-      }
-      const castedUser:User = {
-        userID: foundUser.id,
-        username: foundUser.username,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        displayName: foundUser.displayName,
-        lastLogin: foundUser.dbLastLogOn,
-        siteClinicId: foundUser.siteClinicID,
-        roles: ['user']
-      }
-
-      return { success: true, user: castedUser }
-    } catch (err) {
-      return { success: false, message: err }
-    }
+    return users.map(user => user.toResponseObject(false));
   }
 
-  async readUserByID(userID: string): Promise<Response> {
+  async readUserByUsername(username: string) {
+    const user = await this.usersRepository.findOne({ where: { username, active: true } });
 
-    try {
-      const foundUser = await this.usersRepository.findOne({where: {id: userID}});
-
-      if (!foundUser || foundUser.active === false) {
-        return {success: false, message: 'User Not Found'}
-      }
-      const castedUser:User = {
-        userID: foundUser.id,
-        username: foundUser.username,
-        firstName: foundUser.firstName,
-        lastName: foundUser.lastName,
-        displayName: foundUser.displayName,
-        lastLogin: foundUser.dbLastLogOn,
-        siteClinicId: foundUser.siteClinicID,
-        roles: ['user']
-      }
-      
-      return { success: true, user: castedUser }
-    } catch (err) {
-      return { success: false, message: err }
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
+
+    return user.toResponseObject(false);
   }
 
-  updateUser(userID: string, updatedUser: UpdatedUser): Response {
+  async readUserByID(userID: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userID, active: true } });
 
-    try {
-      // TODO: Update SQL Command
-      return { success: true, user: fakeUser }
-    } catch (err) {
-      return { success: false, message: err }
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND)
     }
+    return user.toResponseObject(false);
   }
 
-  deleteUser(userID: string): Response {
+  async updateUser(userID: string, data: Partial<UserDTO>) {
+    let user = await this.usersRepository.findOne({ where: { id: userID } })
 
-    try {
-      // TODO: Update SQL Command activeBit = 0
-      return { success: true }
-    } catch (err) {
-      return { success: false, message: err }
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND)
     }
-  }
-}
 
-export const fakeUser: User = {
-  userID: '12345678',
-  username: 'Peter.Parker',
-  firstName: 'Peter',
-  lastName: 'Parker',
-  displayName: 'Spiderman',
-  lastLogin: new Date(),
-  siteClinicId: 'langley-mental-health',
-  roles: ['user', 'admin']
+    await this.usersRepository.update({id: userID}, data);
+
+    user = await this.usersRepository.findOne({where: {id: userID}});
+
+    return user.toResponseObject(false);
+  }
+
+  async deleteUser(userID: string) {
+    const user = await this.usersRepository.findOne({where: {id:userID}});
+
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.usersRepository.update({id: userID}, {active: false});
+
+    return {sucess: true};
+
+  }
 }
