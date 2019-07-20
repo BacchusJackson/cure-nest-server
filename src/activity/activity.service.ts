@@ -4,8 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityEntity } from './activity.entity';
 import { Repository } from 'typeorm';
 
-
-
 @Injectable()
 export class ActivityService {
 

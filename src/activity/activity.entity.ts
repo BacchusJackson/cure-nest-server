@@ -3,32 +3,32 @@ import { ActivityRO } from "./activity.dto";
 
 @Entity('ACTIVITY_TABLE')
 export class ActivityEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column('bit')
-    active: boolean;
+  @Column('bit')
+  active: boolean;
 
-    @Column('datetime')
-    autoCreatedDate: Date;
+  @Column('datetime')
+  autoCreatedDate: Date;
 
-    @Column('text')
-    name: string;
+  @Column('text')
+  name: string;
 
-    @Column('text')
-    category: string;
+  @Column('text')
+  category: string;
 
-    @BeforeInsert()
-    async addMetadata() {
-        this.active = true;
-        this.autoCreatedDate = new Date();
-    }
-    
-toResponseObject() {
-    const {id, name, category} = this;
+  @BeforeInsert()
+  async addMetadata() {
+    this.active = true;
+    this.autoCreatedDate = new Date();
+  }
 
-    const responseObject:ActivityRO = {id, name, category};
+  toResponseObject() {
+    const { id, name, category } = this;
+
+    const responseObject: ActivityRO = { id, name, category };
 
     return responseObject;
-    }
+  }
 }
