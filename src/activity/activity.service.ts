@@ -13,6 +13,7 @@ export class ActivityService {
   ) { }
 
   async createActivity(newActivity: ActivityDTO) {
+
     const activity = await this.activityRepository.create(newActivity);
     await this.activityRepository.save(activity);
 

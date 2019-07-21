@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
 import { ActivityRO } from "./activity.dto";
+import { EntryEntity } from "../entry/entry.entity";
 
 @Entity('ACTIVITY_TABLE')
 export class ActivityEntity {
@@ -18,8 +19,11 @@ export class ActivityEntity {
   @Column('text')
   category: string;
 
-  //@OneToMany(type => EntryEntity, entry => entry.activity)
-  //entries: EntryEntity[];
+  @Column('text')
+  properties: string;
+
+  @OneToMany(type => EntryEntity, entry => entry.activity)
+  entries: EntryEntity[];
 
   
   @BeforeInsert()
@@ -29,10 +33,18 @@ export class ActivityEntity {
   }
 
   toResponseObject() {
-    const { id, name, category } = this;
+    const { id, name, category, properties } = this;
 
-    const responseObject: ActivityRO = { id, name, category };
+    const responseObject: ActivityRO = { id, name, category, properties };
 
     return responseObject;
+  }
+
+  toLinkObject() {
+    const { id, name, category } = this;
+
+    const linkObject:Partial<ActivityRO> = { id, name, category };
+
+    return linkObject
   }
 }

@@ -23,6 +23,11 @@ export class EntryEntity {
     @ManyToOne(type => UserEntity, user => user.entries)
     author: UserEntity;
 
+    @ManyToOne(type => ActivityEntity, activity => activity.entries)
+    activity: ActivityEntity;
+
+
+
     @BeforeInsert()
     async addMetadata() {
         this.active = true;

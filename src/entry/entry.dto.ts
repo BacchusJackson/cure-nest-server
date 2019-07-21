@@ -7,6 +7,8 @@ export class EntryDTO {
 
     @IsJSON()
     details: string;
+
+    activityID: string;
 }
 
 export class EntryRO {

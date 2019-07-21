@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EntryEntity } from './entry.entity';
 import { UserEntity } from '../users/user.entity';
+import { ActivityEntity } from '../activity/activity.entity';
 
 @Injectable()
 export class EntryService {
@@ -11,12 +12,15 @@ export class EntryService {
     @InjectRepository(EntryEntity)
     private entryRepository: Repository<EntryEntity>,
     @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>
+    private userRepository: Repository<UserEntity>,
+    @InjectRepository(ActivityEntity)
+    private activityRepository: Repository<ActivityEntity>
   ) { }
 
   private entryToResponseObject(entry: EntryEntity): EntryRO {
     const { id, entryDate, details, author } = entry;
     let detailsObj = null;
+
 
     try {
       detailsObj = JSON.parse(details);
@@ -24,15 +28,11 @@ export class EntryService {
     } catch (err) {
       Logger.error('JSON Parsing Error on Detail', '**EntryService');
     }
+    const activity = entry.activity ? entry.activity.toLinkObject() : null;
 
-    if (!author) {
-      const responseObject: any = { id, entryDate, detailsObj, author: null }
-      return responseObject;
-    }
+    const responseObject: any = { id, entryDate, detailsObj, activity };
 
-    const user = { userID: author.id, username: author.username };
-
-    const responseObject: any = { id, entryDate, details:detailsObj, author: user };
+    responseObject.author = author ? { userID: author.id, username: author.username } : null;
 
     return responseObject;
   }
@@ -40,10 +40,13 @@ export class EntryService {
   async createEntry(userID: string, data: EntryDTO) {
     data.details = JSON.stringify(data.details);
     const user = await this.userRepository.findOne({ where: { id: userID } });
-    const entry = await this.entryRepository.create({ ...data, author: user });
+    const activity = await this.activityRepository.findOne({ where: { id: data.activityID } });
 
+    delete data.activityID;
+
+    
+    const entry = await this.entryRepository.create({ ...data, author: user, activity });
     await this.entryRepository.save(entry);
-
 
     return this.entryToResponseObject(entry);
 
@@ -52,7 +55,7 @@ export class EntryService {
   // C[R]UD
   async readAllEntries() {
 
-    const entries = await this.entryRepository.find({ relations: ['author'], where: {active: true} });
+    const entries = await this.entryRepository.find({ relations: ['author'], where: { active: true } });
 
     return entries.map(entry => this.entryToResponseObject(entry));
 
@@ -60,13 +63,13 @@ export class EntryService {
 
   // CRU[D]
   async deleteEntry(entryID: string) {
-    const entry = await this.entryRepository.findOne({where: {id: entryID}});
+    const entry = await this.entryRepository.findOne({ where: { id: entryID } });
 
-    if(!entry) {
+    if (!entry) {
       throw new HttpException('Entry Not Found', HttpStatus.NOT_FOUND);
     }
-    await this.entryRepository.update({id: entryID}, {active: false});
-    return {success: true};
+    await this.entryRepository.update({ id: entryID }, { active: false });
+    return { success: true };
 
   }
 
