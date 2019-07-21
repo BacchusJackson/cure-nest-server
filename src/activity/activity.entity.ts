@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
 import { ActivityRO } from "./activity.dto";
 
 @Entity('ACTIVITY_TABLE')
@@ -18,6 +18,10 @@ export class ActivityEntity {
   @Column('text')
   category: string;
 
+  //@OneToMany(type => EntryEntity, entry => entry.activity)
+  //entries: EntryEntity[];
+
+  
   @BeforeInsert()
   async addMetadata() {
     this.active = true;

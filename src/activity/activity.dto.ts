@@ -1,5 +1,4 @@
 import { IsString } from "class-validator";
-import { ActivityEntity } from "../activity/activity.entity";
 
 export class ActivityDTO {
   @IsString()

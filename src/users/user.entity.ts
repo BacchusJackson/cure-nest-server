@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserRO } from "./user.dto";
+import { EntryEntity } from "../entry/entry.entity";
 
 @Entity('USERS_TABLE')
 export class UserEntity {
@@ -28,6 +29,9 @@ export class UserEntity {
 
   @Column('text')
   displayName: string;
+
+  @OneToMany(type => EntryEntity, entry => entry.author)
+  entries: EntryEntity[];
 
   @Column({nullable: true, type: 'uuid'})
   siteClinicID: string;

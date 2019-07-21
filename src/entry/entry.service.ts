@@ -1,64 +1,73 @@
-import { Injectable } from '@nestjs/common';
-import { Entry, NewEntry, Response } from './entryCollection.interface'
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { EntryDTO, EntryRO } from "./entry.dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { EntryEntity } from './entry.entity';
+import { UserEntity } from '../users/user.entity';
 
 @Injectable()
 export class EntryService {
+  constructor(
+    @InjectRepository(EntryEntity)
+    private entryRepository: Repository<EntryEntity>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>
+  ) { }
 
-  createEntry(newEntry: NewEntry): Response {
-
-    newEntry.dateCreated = new Date();
-    newEntry.active = true;
-
-    try {
-      // TODO: Insert SQL Command
-      return { success: true, message: null };
-    } catch (err) {
-      return { success: false, message: err };
-    }
-  }
-
-  readAllEntries(): Response {
+  private entryToResponseObject(entry: EntryEntity): EntryRO {
+    const { id, entryDate, details, author } = entry;
+    let detailsObj = null;
 
     try {
-      // TODO: Select SQL Command
-      return { success: true, message: null, entries: [fakeEntry, fakeEntry, fakeEntry]}
+      detailsObj = JSON.parse(details);
+
     } catch (err) {
-      return { success: false, message: err}
+      Logger.error('JSON Parsing Error on Detail', '**EntryService');
     }
+
+    if (!author) {
+      const responseObject: any = { id, entryDate, detailsObj, author: null }
+      return responseObject;
+    }
+
+    const user = { userID: author.id, username: author.username };
+
+    const responseObject: any = { id, entryDate, details:detailsObj, author: user };
+
+    return responseObject;
+  }
+  // [C]RUD
+  async createEntry(userID: string, data: EntryDTO) {
+    data.details = JSON.stringify(data.details);
+    const user = await this.userRepository.findOne({ where: { id: userID } });
+    const entry = await this.entryRepository.create({ ...data, author: user });
+
+    await this.entryRepository.save(entry);
+
+
+    return this.entryToResponseObject(entry);
+
   }
 
-  deleteEntry(entryID: string): Response {
+  // C[R]UD
+  async readAllEntries() {
 
-    try {
-      // TODO: Update SQL Command ActiveBit = 0
-      return { success: true, message: null }
-    } catch (err) {
-      return { success: false, message: err }
-    }
+    const entries = await this.entryRepository.find({ relations: ['author'], where: {active: true} });
+
+    return entries.map(entry => this.entryToResponseObject(entry));
+
   }
 
-  private getEntryByID(entryID: string): Entry {
+  // CRU[D]
+  async deleteEntry(entryID: string) {
+    const entry = await this.entryRepository.findOne({where: {id: entryID}});
 
-    if (entryID == '123') {
-      return fakeEntry;
+    if(!entry) {
+      throw new HttpException('Entry Not Found', HttpStatus.NOT_FOUND);
     }
-    return null;
-  }
-}
+    await this.entryRepository.update({id: entryID}, {active: false});
+    return {success: true};
 
-export const fakeEntry: Entry = {
-  entryID: '123',
-  dateCreated: new Date(),
-  active: true,
-  date: new Date(),
-  category: 'Team Event',
-  activity: 'Fun Day',
-  details: {
-    members: 10,
-    hours: 20,
-    description: 'talked about drug prevention'
-  },
-  username: 'Joe',
-  site: 'Langley',
-  clinic: 'Mental Health'
+  }
+
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Credentials, SignInResponse, UserObject } from "../users/userCollection.interface";
 import { JwtService } from "@nestjs/jwt";
 import { UsersService } from "../users/users.service";
 
@@ -7,10 +6,10 @@ import { UsersService } from "../users/users.service";
 export class AuthenticationService {
   constructor(private readonly jwtService: JwtService ) { }
 
-  authenticateUserCredentials(credentials: Credentials): SignInResponse {
+  authenticateUserCredentials(credentials) {
 
     // Check database for user
-    const foundUser = null //this.usersService.readUserByUsername(credentials.username).user;
+    const foundUser = null 
 
     if (!foundUser) {
       return { success: false, message: 'Invalid Credentials' };
@@ -26,7 +25,7 @@ export class AuthenticationService {
     return { success: true, token: token, expiresIn: 3600 };
   }
 
-  private confirmPassword(user: UserObject, passwordAttempt: string) {
+  private confirmPassword(user, passwordAttempt: string) {
     // TODO: Select SQL Command
     const hashedPassword = 'MASKED';
 
