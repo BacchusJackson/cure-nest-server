@@ -30,14 +30,15 @@ export class UserEntity {
   @Column('text')
   displayName: string;
 
-  @OneToMany(type => EntryEntity, entry => entry.author)
-  entries: EntryEntity[];
-
+  
   @Column({nullable: true, type: 'uuid'})
   siteClinicID: string;
-
+  
   @Column('text')
   password: string;
+  
+  @OneToMany(type => EntryEntity, entry => entry.author)
+  entries: EntryEntity[];
   
   @BeforeInsert()
   async addMetadata() {

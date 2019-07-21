@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthenticationModule } from './authentication/authentication.module';
 import { UsersModule } from './users/users.module';
 import { EntryModule } from './entry/entry.module';
 import { ActivityModule } from './activity/activity.module';

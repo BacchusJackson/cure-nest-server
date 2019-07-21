@@ -1,38 +1,53 @@
-import { Controller, Get, Param, Post, Body, Delete, Put, Logger } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Delete, Put, Logger, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { AuthGuard } from '../common/auth.guard';
 
-@Controller('users')
+@Controller('')
 export class UsersController {
   private logger = new Logger('**UsersController');
   constructor(private readonly usersService: UsersService) { }
 
-  @Post()
+  @Post('logOn')
+  postLogOnRequest(@Body() credentials) {
+    this.logger.log('Log On Attempt @' + credentials.username, '**UsersService');
+
+    return this.usersService.logOn(credentials);
+
+  }
+
+  @Post('users')
+  @UseGuards(AuthGuard)
   postUserRequest(@Body() newUser) {
     this.logger.log('New User Request, Username: ' + newUser.username);
     return this.usersService.createUser(newUser);
   }
 
-  @Get()
+  @Get('users')
+  @UseGuards(AuthGuard)
   getAllUsersRequest() {
     return this.usersService.readAllUsers();
   }
 
-  @Get('/username/:username')
+  @Get('users/username/:username')
+  @UseGuards(AuthGuard)
   getUserByUsernameRequest(@Param('username') username) {
     return this.usersService.readUserByUsername(username);
   }
 
-  @Get('/id/:id')
+  @Get('users/id/:id')
+  @UseGuards(AuthGuard)
   getUserByIDRequest(@Param('id') id) {
     return this.usersService.readUserByID(id);
   }
 
-  @Put('/id/:id')
+  @Put('users/id/:id')
+  @UseGuards(AuthGuard)
   putUserRequest(@Param('id') id, @Body() updateUser) {
     return this.usersService.updateUser(id, updateUser);
   }
 
-  @Delete('/id/:id')
+  @Delete('users/id/:id')
+  @UseGuards(AuthGuard)
   deleteUserRequest(@Param('id') id) {
     this.logger.log('Delete User Request, id:' + id)
     return this.usersService.deleteUser(id);

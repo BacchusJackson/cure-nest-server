@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Get, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Put, Param, Delete, UseGuards } from '@nestjs/common';
 import { ActivityService } from './activity.service';
 import { ActivityDTO } from "./activity.dto";
+import { AuthGuard } from '../common/auth.guard';
 
 @Controller('activity')
+@UseGuards(AuthGuard)
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) { }
 

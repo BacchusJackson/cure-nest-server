@@ -10,6 +10,21 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>
   ) { }
 
+  async logOn(credentials: { username: string, password: string }) {
+    const { username, password } = credentials;
+
+    const user = await this.usersRepository.findOne({ where: { username } });
+
+    if (!user || !(await user.comparePassword(password))) {
+      throw new HttpException('Invalid Username/Password', HttpStatus.BAD_REQUEST);
+    };
+
+    this.usersRepository.update({ id: user.id }, { autoLastLogOn: new Date() });
+    
+    return user.toResponseObject(true);
+    
+  }
+
   async createUser(data: UserDTO) {
     const { username } = data;
     let user = await this.usersRepository.findOne({ where: { username } });
@@ -56,23 +71,23 @@ export class UsersService {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND)
     }
 
-    await this.usersRepository.update({id: userID}, data);
+    await this.usersRepository.update({ id: userID }, data);
 
-    user = await this.usersRepository.findOne({where: {id: userID}});
+    user = await this.usersRepository.findOne({ where: { id: userID } });
 
     return user.toResponseObject(false);
   }
 
   async deleteUser(userID: string) {
-    const user = await this.usersRepository.findOne({where: {id:userID}});
+    const user = await this.usersRepository.findOne({ where: { id: userID } });
 
     if (!user) {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
 
-    await this.usersRepository.update({id: userID}, {active: false});
+    await this.usersRepository.update({ id: userID }, { active: false });
 
-    return {sucess: true};
+    return { sucess: true };
 
   }
 }

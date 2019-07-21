@@ -1,8 +1,10 @@
 import { Controller, Post, Body, Get, Delete, Param, UseGuards } from '@nestjs/common';
 import { EntryService } from './entry.service';
 import { EntryDTO } from "./entry.dto";
+import { AuthGuard } from "../common/auth.guard";
 
 @Controller('entry')
+@UseGuards(AuthGuard)
 export class EntryController {
   constructor(private readonly entryService: EntryService) { }
 
