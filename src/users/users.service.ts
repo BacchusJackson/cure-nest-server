@@ -1,8 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, ExecutionContext } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
 import { UserDTO } from "./user.dto";
+import * as jwt from 'jsonwebtoken';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -20,9 +22,9 @@ export class UsersService {
     };
 
     this.usersRepository.update({ id: user.id }, { autoLastLogOn: new Date() });
-    
+
     return user.toResponseObject(true);
-    
+
   }
 
   // [C]RUD
@@ -46,8 +48,17 @@ export class UsersService {
 
     return users.map(user => user.toResponseObject(false));
   }
+
   // C[R]UD
-  async readUserByUsername(username: string) {
+  async readUserByUsername(username: string, token?: string) {
+
+    if (token) {
+      const tokenMatch = await this.tokenMatchesRequest(username, token);
+      if (!tokenMatch) {
+        throw new HttpException('Invalid Permmisions', HttpStatus.UNAUTHORIZED);
+      }
+    }
+
     const user = await this.usersRepository.findOne({ where: { username, active: true } });
 
     if (!user) {
@@ -82,6 +93,27 @@ export class UsersService {
     return user.toResponseObject(false);
   }
 
+  async updateMyProfile(username: string, data: Partial<UserDTO>, token: string) {
+
+    const tokenMatch = await this.tokenMatchesRequest(username, token);
+    if (!tokenMatch) {
+      throw new HttpException('Invalid Permmisions', HttpStatus.UNAUTHORIZED);
+    }
+
+
+    let user = await this.usersRepository.findOne({ where: { username: username } })
+
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND)
+    }
+
+    await this.usersRepository.update({ id: user.id }, data);
+
+    user = await this.usersRepository.findOne({ where: { id: user.id } });
+
+    return user.toResponseObject(false);
+  }
+
   // CRU[D]
   async deleteUser(userID: string) {
     const user = await this.usersRepository.findOne({ where: { id: userID } });
@@ -98,14 +130,30 @@ export class UsersService {
 
   async modifyRoles(userID, data) {
 
-    const user = this.usersRepository.find({where: {id: userID}});
+    const user = this.usersRepository.find({ where: { id: userID } });
 
-    if(!user) {
+    if (!user) {
       throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
     }
 
-    await this.usersRepository.update({id: userID }, {roles: data.roles});
+    await this.usersRepository.update({ id: userID }, { roles: data.roles });
 
-    return {success: true}
+    return { success: true }
+  }
+
+  private async tokenMatchesRequest(attemptedUsername: string, token: string) {
+
+    if (!token) return false;
+
+    const decodedUser: any = await jwt.verify(token, process.env.SECRET);
+
+    const { username } = decodedUser;
+
+    if (!(attemptedUsername === username)) return false;
+
+    return true;
+
+
+
   }
 }
