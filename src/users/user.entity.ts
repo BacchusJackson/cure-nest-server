@@ -37,12 +37,16 @@ export class UserEntity {
   @Column('text')
   password: string;
   
+  @Column({nullable: true, type: 'text'})
+  roles: string;
+
   @OneToMany(type => EntryEntity, entry => entry.author)
   entries: EntryEntity[];
-  
+
   @BeforeInsert()
   async addMetadata() {
     this.password = await bcrypt.hash(this.password, 11);
+    this.roles = "user";
     this.active = true;
     this.autoCreatedDate = new Date();
     this.autoLastLogOn = new Date();
@@ -54,11 +58,11 @@ export class UserEntity {
   }
 
   toResponseObject(showToken: boolean = true): UserRO {
-    const { id, username, firstName, lastName, displayName, autoLastLogOn, autoCreatedDate } = this;
+    const { id, username, firstName, lastName, displayName, autoLastLogOn, autoCreatedDate, roles } = this;
 
     const responseObject: UserRO = {
       id, username, firstName, lastName,
-      displayName, lastLogOn: autoLastLogOn, created: autoCreatedDate
+      displayName, lastLogOn: autoLastLogOn, created: autoCreatedDate, roles
     }
 
     if(showToken) {
@@ -69,8 +73,7 @@ export class UserEntity {
   }
 
   private get token(): string {
-    const { id, username } = this;
-
-    return jwt.sign({ id, username }, process.env.SECRET, { expiresIn: '7d' });
+    const { id, username, roles } = this;
+    return jwt.sign({ id, username, roles }, process.env.SECRET, { expiresIn: '7d' });
   }
 }

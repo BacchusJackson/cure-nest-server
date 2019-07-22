@@ -28,6 +28,7 @@ export class UserRO {
   displayName: string;
   created: Date;
   lastLogOn: Date;
+  roles?: string;
   token?: string;
   users?: UserEntity;
 }

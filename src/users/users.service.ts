@@ -13,7 +13,7 @@ export class UsersService {
   async logOn(credentials: { username: string, password: string }) {
     const { username, password } = credentials;
 
-    const user = await this.usersRepository.findOne({ where: { username } });
+    const user = await this.usersRepository.findOne({ where: { username, active: true } });
 
     if (!user || !(await user.comparePassword(password))) {
       throw new HttpException('Invalid Username/Password', HttpStatus.BAD_REQUEST);
@@ -25,6 +25,7 @@ export class UsersService {
     
   }
 
+  // [C]RUD
   async createUser(data: UserDTO) {
     const { username } = data;
     let user = await this.usersRepository.findOne({ where: { username } });
@@ -39,12 +40,13 @@ export class UsersService {
 
   }
 
+  // C[R]UD
   async readAllUsers() {
     const users = await this.usersRepository.find({ where: { active: true } });
 
     return users.map(user => user.toResponseObject(false));
   }
-
+  // C[R]UD
   async readUserByUsername(username: string) {
     const user = await this.usersRepository.findOne({ where: { username, active: true } });
 
@@ -55,6 +57,7 @@ export class UsersService {
     return user.toResponseObject(false);
   }
 
+  // C[R]UD
   async readUserByID(userID: string) {
     const user = await this.usersRepository.findOne({ where: { id: userID, active: true } });
 
@@ -64,6 +67,7 @@ export class UsersService {
     return user.toResponseObject(false);
   }
 
+  // CR[U]D
   async updateUser(userID: string, data: Partial<UserDTO>) {
     let user = await this.usersRepository.findOne({ where: { id: userID } })
 
@@ -78,6 +82,7 @@ export class UsersService {
     return user.toResponseObject(false);
   }
 
+  // CRU[D]
   async deleteUser(userID: string) {
     const user = await this.usersRepository.findOne({ where: { id: userID } });
 
@@ -89,5 +94,18 @@ export class UsersService {
 
     return { sucess: true };
 
+  }
+
+  async modifyRoles(userID, data) {
+
+    const user = this.usersRepository.find({where: {id: userID}});
+
+    if(!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.usersRepository.update({id: userID }, {roles: data.roles});
+
+    return {success: true}
   }
 }
