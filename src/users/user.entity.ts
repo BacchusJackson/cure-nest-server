@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany, ManyToOne } from "typeorm";
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { UserRO } from "./user.dto";
 import { EntryEntity } from "../entry/entry.entity";
+import { ClinicEntity } from "../clinic/clinic.entity";
 
 @Entity('USERS_TABLE')
 export class UserEntity {
@@ -30,10 +31,6 @@ export class UserEntity {
   @Column('text')
   displayName: string;
 
-  
-  @Column({nullable: true, type: 'uuid'})
-  siteClinicID: string;
-  
   @Column('text')
   password: string;
   
@@ -42,6 +39,9 @@ export class UserEntity {
 
   @OneToMany(type => EntryEntity, entry => entry.author)
   entries: EntryEntity[];
+
+  @ManyToOne(type => ClinicEntity, clinic => clinic.users)
+  clinic: ClinicEntity;
 
   @BeforeInsert()
   async addMetadata() {

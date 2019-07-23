@@ -80,6 +80,13 @@ export class UsersController {
     return this.usersService.modifyRoles(id, data);
   }
 
+  @Post('admin/users/clinic/id=:id')
+  @UseGuards(AuthGuard)
+  @Roles('admin')
+  postClinicRequest(@Param('id')id, @Body() data) {
+    return this.usersService.modifyClinic(id, data.clinicID);
+  }
+
   @Delete('admin/users/id=:id')
   @UseGuards(AuthGuard)
   @Roles('admin')

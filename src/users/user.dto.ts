@@ -1,5 +1,6 @@
 import { IsString } from "class-validator";
 import { UserEntity } from "../users/user.entity";
+import { ClinicRO } from "../clinic/clinic.dto";
 
 export class UserDTO {
   
@@ -31,4 +32,5 @@ export class UserRO {
   roles?: string;
   token?: string;
   users?: UserEntity;
+  clinic?: ClinicRO;
 }
