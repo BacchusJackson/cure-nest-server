@@ -49,6 +49,12 @@ export class UsersService {
     return users.map(user => user.toResponseObject(false));
   }
 
+  async readAllUsersWithDeleted() {
+    const users = await this.usersRepository.find();
+
+    return users.map(user => user.toResponseObject(false));
+  }
+
   // C[R]UD
   async readUserByUsername(username: string, token?: string) {
 
@@ -124,8 +130,20 @@ export class UsersService {
 
     await this.usersRepository.update({ id: userID }, { active: false });
 
-    return { sucess: true };
+    return { success: true };
 
+  }
+
+  async restoreUser(userID: string) {
+    const user = await this.usersRepository.findOne({ where: { id: userID } });
+
+    if (!user) {
+      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.usersRepository.update({ id: userID }, { active: true })
+
+    return { success: true };
   }
 
   async modifyRoles(userID, data) {
@@ -153,7 +171,6 @@ export class UsersService {
 
     return true;
 
-
-
   }
+
 }

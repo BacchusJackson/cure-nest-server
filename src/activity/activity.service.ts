@@ -26,6 +26,12 @@ export class ActivityService {
     return activities.map(activity => activity.toResponseObject());
   }
 
+  async readAllActivitiesWithDeleted() {
+    const activities = await this.activityRepository.find();
+
+    return activities.map(activity => activity.toResponseObject());
+  }
+
   async updateActivity(activityID: string, updatedActivity: Partial<ActivityDTO>) {
     let activity = await this.activityRepository.findOne({ where: { id: activityID } });
 
@@ -51,5 +57,18 @@ export class ActivityService {
     await this.activityRepository.update({ id: activityID }, { active: false });
 
     return { success: true }
+  }
+  
+  async restoreActivity(activityID: string) {
+    let activity = await this.activityRepository.findOne({ where: { id: activityID } });
+    
+    if (!activity) {
+      throw new HttpException('Activity Not Found', HttpStatus.NOT_FOUND);
+    }
+    
+    await this.activityRepository.update({ id: activityID }, { active: true });
+    
+    return { success: true }
+    
   }
 }
